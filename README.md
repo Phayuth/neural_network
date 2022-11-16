@@ -16,3 +16,7 @@ Some collection of neural network code.
 	- https://blog.paperspace.com/working-with-custom-image-datasets-in-pytorch/
 	- https://blog.paperspace.com/building-simple-web-scrapers-for-image-data-collection/
 	- https://blog.paperspace.com/train-yolov7-custom-data/
+    
+- Neural Network for Inverse Kinematic
+	- https://github.com/Utkarsh-Vats-2000/Inverse-Kinematics-using-Neural-Networks
+	- https://github.com/paramrajpura/Neural-Networks-for-Inverse-Kinematics
