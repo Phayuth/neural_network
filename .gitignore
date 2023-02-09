@@ -24,5 +24,10 @@ venv.bak/
 
 # Ignore dataset folder
 data/
-
+dataset/
 build/
+MNIST/
+
+# Ignore Weight file
+*.pt
+*.h5

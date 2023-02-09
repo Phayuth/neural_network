@@ -1,1 +1,0 @@
-https://github.com/alantess/learntorch/tree/main/torchscript/L3/dataset
