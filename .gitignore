@@ -31,3 +31,6 @@ MNIST/
 # Ignore Weight file
 *.pt
 *.h5
+
+# Ignore tensorboad folder
+runs/
