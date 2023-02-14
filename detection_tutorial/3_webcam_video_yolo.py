@@ -7,7 +7,7 @@ import cv2
 # capture.set(4, 720)
 
 # Video
-capture = cv2.VideoCapture('./dataset/people.mp4')
+capture = cv2.VideoCapture('./dataset/cars.mp4')
 
 model = ultralytics.YOLO('./weight/yolov8n.pt')
 
