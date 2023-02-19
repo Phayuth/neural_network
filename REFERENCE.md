@@ -7,6 +7,7 @@
 
 
 ### Reference
+- [Object Detection 101 Course by Murtaza's Workshop](https://www.youtube.com/watch?v=WgPbbWmnXJ8)
 - [Torchlib tutorial](https://www.youtube.com/watch?v=RFq8HweBjHA)
 - [Some source code](https://github.com/ActiveIntelligentSystemsLab/pytorch_enet_ros)
 - catkin_lib and torch lib error : 
