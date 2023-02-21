@@ -2,14 +2,14 @@ import ultralytics
 import cv2
 
 # Camera
-# capture = cv2.VideoCapture(0)
-# capture.set(3, 1280)
-# capture.set(4, 720)
+capture = cv2.VideoCapture(4)
+capture.set(3, 1280)
+capture.set(4, 720)
 
 # Video
-capture = cv2.VideoCapture('./dataset/cars.mp4')
+# capture = cv2.VideoCapture('./dataset/cars.mp4')
 
-model = ultralytics.YOLO('./weight/yolov8n.pt')
+model = ultralytics.YOLO('./weight/yolov8l.pt')
 
 while True:
     success, img = capture.read()
@@ -23,7 +23,7 @@ while True:
             classes_name = model.names[classes_number] # give class name from model in dictionary
             cv2.putText(img,
                         text=classes_name+str(round(confident.item(),2)),
-                        org=(int(x1),int(y1)),
+                        org=(int(x1),int(y1+(y2-y1)/2)),
                         fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                         fontScale=1,
                         thickness = 2,
