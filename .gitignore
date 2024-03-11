@@ -12,7 +12,6 @@ __pycache__/
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow
 __pypackages__/
 
-
 # Environments
 .env
 .venv
@@ -21,6 +20,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.vscode/
 
 # Ignore dataset folder
 data/
@@ -28,8 +28,16 @@ dataset/
 build/
 MNIST/
 
+# pointcloud and stl
+*.yaml
+*.stl
+*.ply
+*.pcd
+*.bag
+
 # Ignore Weight file
 *.pt
+*.pth
 *.h5
 
 # Ignore tensorboad folder
