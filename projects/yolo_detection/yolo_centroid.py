@@ -15,7 +15,7 @@ class CVYOLOCentroid:
         self.model = ultralytics.YOLO(torchModelPath)
         self.interestNames = interestNames
         self.erodeKernel = np.ones((7, 7), np.uint8)
-        print(f"Available Class Name are : {self.model.names}")
+        # print(f"Available Class Name are : {self.model.names}")
 
     def detect_centroid(self, img, edgeErode=False, drawImg=False):
         indvMask = []
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     cam = CVCamera(4)
 
     torchModelPath = "./datasave/neural_weight/yolov8x-seg.pt"
-    cvc = CVYOLOCentroid(torchModelPath, interestNames=["apple"])
+    cvc = CVYOLOCentroid(torchModelPath, interestNames=["wine glass", "cup"])
 
     while cam.capture.isOpened():
         success, img = cam.capture.read()

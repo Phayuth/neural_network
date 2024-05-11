@@ -1,9 +1,11 @@
 import os
 import sys
+
 wd = os.path.abspath(os.getcwd())
 sys.path.append(str(wd))
 sys.path.append("/home/yuth/ws_yuthdev/robotics_manipulator")
 
+import time
 import numpy as np
 import open3d as o3d
 from spatial_geometry.spatial_transformation import RigidBodyTransformation as rbt
@@ -29,21 +31,31 @@ class NormalVectorParallelGraspPose:
     def __init__(self, pointArray, fixedOrientation=True, distanceOffset=0.1, downSampleVoxelSize=0.01) -> None:
         self.pcd = o3d.geometry.PointCloud()
         self.pcd.points = o3d.utility.Vector3dVector(pointArray)
+        timea = time.perf_counter_ns()
         self.pcd.estimate_normals()
         self.pcd.normalize_normals()
         self.pcd.orient_normals_towards_camera_location()
+        timeb = time.perf_counter_ns()
         self.pcd, _ = self.pcd.remove_radius_outlier(nb_points=16, radius=0.05)
+        timec = time.perf_counter_ns()
         self.pcdDownSample = self.pcd.voxel_down_sample(voxel_size=downSampleVoxelSize)
-
+        timed = time.perf_counter_ns()
         self.graspPoint = np.asarray(self.pcdDownSample.points).T
 
         if fixedOrientation is True:
-            self.normalPointOut = np.zeros((3,self.graspPoint.shape[1]))
+            self.normalPointOut = np.zeros((3, self.graspPoint.shape[1]))
             self.normalPointOut[0] = -1
         else:
             self.normalPointOut = np.asarray(self.pcdDownSample.normals).T
 
-        self.preGraspPoint, self.normalPointIntoCrop = self.pregrasp_point_offset(self.graspPoint, self.normalPointOut * -1, distanceOffset=distanceOffset) # (3, N)
+        self.preGraspPoint, self.normalPointIntoCrop = self.pregrasp_point_offset(self.graspPoint, self.normalPointOut * -1, distanceOffset=distanceOffset)  # (3, N)
+        timee = time.perf_counter_ns()
+
+        # time
+        self.timenormalest = timeb - timea
+        self.timeoutremove = timec - timeb
+        self.timedownsample = timed - timec
+        self.timeconstruct = timee - timed
 
     def get_point(self):
         return self.graspPoint, self.preGraspPoint, self.normalPointIntoCrop
@@ -66,7 +78,7 @@ class NormalVectorParallelGraspPose:
         rotAxis /= np.linalg.norm(rotAxis) + 0.0000000001  # to avoid devide by 0
         rotCos = np.dot(zAxis, unitVector)
         rotSin = np.sqrt(1 - rotCos**2)
-        rotMat = np.eye(3) + rotSin * rbt.vec_to_skew(rotAxis) + (1-rotCos) * rbt.vec_to_skew(rotAxis) @ rbt.vec_to_skew(rotAxis)
+        rotMat = np.eye(3) + rotSin * rbt.vec_to_skew(rotAxis) + (1 - rotCos) * rbt.vec_to_skew(rotAxis) @ rbt.vec_to_skew(rotAxis)
         return rotMat
 
 
@@ -87,3 +99,19 @@ if __name__ == "__main__":
         plot_transform(ax, A2B=preGrasp[i], s=0.01)
     plt.tight_layout()
     plt.show()
+
+    # measurement time
+    p = [NormalVectorParallelGraspPose(xyz, fixedOrientation=True) for i in range(100)]
+    timenormalest = [pt.timenormalest for pt in p]
+    timeoutremove = [pt.timeoutremove for pt in p]
+    timedownsample = [pt.timedownsample for pt in p]
+    timeconstruct = [pt.timeconstruct for pt in p]
+
+    timenormalest = np.mean(timenormalest)
+    print(f"> timenormalest: {timenormalest}")
+    timeoutremove = np.mean(timeoutremove)
+    print(f"> timeoutremove: {timeoutremove}")
+    timedownsample = np.mean(timedownsample)
+    print(f"> timedownsample: {timedownsample}")
+    timeconstruct = np.mean(timeconstruct)
+    print(f"> timeconstruct: {timeconstruct}")

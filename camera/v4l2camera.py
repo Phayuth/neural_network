@@ -23,8 +23,8 @@ class CVCamera:
         print(f"CAP_PROP_CONVERT_RGB : {self.capture.get(cv2.CAP_PROP_CONVERT_RGB)}")
 
 
-if __name__ == "__main__":
-    cam = CVCamera(0)
+def single_shot():
+    cam = CVCamera(4)
     success, imgRGB = cam.capture.read()
     cam.get_cam_property()
     # imgRGB = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2RGB)
@@ -32,3 +32,19 @@ if __name__ == "__main__":
     cv2.waitKey(0)
     cam.capture.release()
     cv2.destroyAllWindows()
+
+
+def stream():
+    cam = CVCamera(4)
+    while cam.capture.isOpened():
+        success, img = cam.capture.read()
+        if success:
+            cv2.imshow("Image", img)
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+    cam.capture.release()
+    cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    stream()

@@ -24,7 +24,6 @@ mesh = o3d.geometry.TriangleMesh.create_coordinate_frame()
 mesh.scale(0.5, center=mesh.get_center())
 
 # xyz = np.load(path+f'pcscan_camera_link_id_9.npy')[:,0:3]
-
 # pcd = o3d.geometry.PointCloud()
 # pcd.points = o3d.utility.Vector3dVector(xyz)
 # # pcd.transform(HcoTcl)

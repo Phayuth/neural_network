@@ -15,11 +15,12 @@ class CVYOLOMask:
         self.model = ultralytics.YOLO(torchModelPath)
         self.interestNames = interestNames
         self.erodeKernel = np.ones((6, 6), np.uint8)
+        self.conf = 0.5
         print(f"Available Class Name are : {self.model.names}")
 
     def detect_mask(self, img, edgeErode=False, drawImg=False):
         indvMask = []
-        result = self.model(img, stream=True, conf=0.5)
+        result = self.model(img, stream=True)
         for r in result:
             for bi, box in enumerate(r.boxes):
                 classesNumber = int(box.cls[0].item())
@@ -71,7 +72,7 @@ if __name__ == "__main__":
 
     cam = CVCamera(4)
 
-    torchModelPath = "./datasave/neural_weight/yolov8x-seg.pt"
+    torchModelPath = "/home/yuth/ws_yuthdev/neural_network/datasave/neural_weight/yolov8x-seg.pt"
     cvc = CVYOLOMask(torchModelPath, interestNames=["apple"])
 
     while cam.capture.isOpened():
