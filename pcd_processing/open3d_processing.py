@@ -1,6 +1,14 @@
+import os
+import sys
+
+wd = os.path.abspath(os.getcwd())
+sys.path.append(str(wd))
+sys.path.append("/home/yuth/ws_yuthdev/robotics_manipulator")
+
 import numpy as np
 import open3d as o3d
 import matplotlib.pyplot as plt
+from spatial_geometry.spatial_transformation import RigidBodyTransformation as rbt
 
 
 def example():
@@ -59,10 +67,32 @@ def process_pose_array():
     # downsample
     pcdDownSample = pcd.voxel_down_sample(voxel_size=0.005)
 
+    # arrow
+    arw1 = o3d.geometry.TriangleMesh.create_arrow(cylinder_radius=0.002, cylinder_height=0.02, cone_radius=0.003, cone_height=0.01)
+    arw2 = o3d.geometry.TriangleMesh.create_arrow(cylinder_radius=0.002, cylinder_height=0.02, cone_radius=0.003, cone_height=0.01)
+    arw3 = o3d.geometry.TriangleMesh.create_arrow(cylinder_radius=0.002, cylinder_height=0.02, cone_radius=0.003, cone_height=0.01)
+    H = rbt.hry(np.pi/2)
+    H = H @ rbt.ht(0,0.01,0.35)
+    arw1.transform(H)
+    arw1.paint_uniform_color([0, 0, 1])
+    arw1.compute_vertex_normals()
+
+    H = rbt.hry(np.pi/2+0.1)
+    H = H @ rbt.ht(-0.05,0.01,0.35)
+    arw2.transform(H)
+    arw2.paint_uniform_color([0, 0, 1])
+    arw2.compute_vertex_normals()
+
+    H = rbt.hry(np.pi/2-0.1)
+    H = H @ rbt.ht(0.05,0.01,0.35)
+    arw3.transform(H)
+    arw3.paint_uniform_color([0, 0, 1])
+    arw3.compute_vertex_normals()
+
     # paint and view
     pcd.paint_uniform_color([1, 0, 0])
     pcdDownSample.paint_uniform_color([0, 0, 1])
-    o3d.visualization.draw_geometries([pcd, pcdDownSample])
+    o3d.visualization.draw_geometries([pcd, arw1, arw2, arw3])
 
 
 def pcd_load_zed():
@@ -126,6 +156,6 @@ def pcdrgb_load_zed():
 
 if __name__ == "__main__":
     # example()
-    # process_pose_array()
+    process_pose_array()
     # pcd_load_zed()
-    pcdrgb_load_zed()
+    # pcdrgb_load_zed()

@@ -9,12 +9,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import open3d as o3d
 from spatial_geometry.spatial_transformation import RigidBodyTransformation as rbt
-from pytransform3d.transformations import plot_transform
-from pytransform3d.plot_utils import make_3d_axis
-import cv2
 import pytransform3d.camera as pc
 import pytransform3d.transformations as pt
-
+from merge_harvest import transform_pcd, crop_pcd
 
 # def tcp_to_h(tcp):
 #     R, _ = cv2.Rodrigues(np.array(tcp[3:6]))
@@ -30,8 +27,8 @@ import pytransform3d.transformations as pt
 # pt.plot_transform(ax, HcamleftTotool0, s=0.1, name="CAML")
 # plt.show()
 
-
 pcd = o3d.io.read_point_cloud("/home/yuth/meshscan/fused_point_cloud_wrt_first_tcp.ply")
+pcd = crop_pcd(pcd)
 o3d.visualization.draw([pcd])
 
 

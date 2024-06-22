@@ -12,6 +12,7 @@ from spatial_geometry.spatial_transformation import RigidBodyTransformation as r
 import cv2
 import pytransform3d.camera as pc
 import pytransform3d.transformations as pt
+import time
 
 
 def tcp_to_h(tcp):
@@ -95,67 +96,78 @@ o3d.visualization.draw_geometries([pcd],
                                   lookat=[ 3.0194881983280792, 1.1271710421207048, 0.72749091588348103 ],
                                   up= [ -0.47058868018676925, 0.051896855322870195, 0.88082518724640912 ])
 
-# # multiple pcd no transform
-# pcdnpylist = [np.load(path + f"pcd_leftframe_id_{i}.npy") for i in range(8)]
-# pcdlist = [numpy_to_o3dpointcloud(py[:, 0:3], py[:, 3:6]) for py in pcdnpylist]
-# origin = o3d.geometry.TriangleMesh.create_coordinate_frame()
-# origin.scale(0.5, center=origin.get_center())
-# o3d.visualization.draw_geometries(pcdlist + [origin])
+# multiple pcd no transform
+pcdnpylist = [np.load(path + f"pcd_leftframe_id_{i}.npy") for i in range(8)]
+pcdlist = [numpy_to_o3dpointcloud(py[:, 0:3], py[:, 3:6]) for py in pcdnpylist]
+origin = o3d.geometry.TriangleMesh.create_coordinate_frame()
+origin.scale(0.5, center=origin.get_center())
+o3d.visualization.draw_geometries(pcdlist + [origin])
 
-# # multiple pcd with transform
-# pcdnpylist = [np.load(path + f"pcd_leftframe_id_{i}.npy") for i in range(8)]
-# pcdlist = [numpy_to_o3dpointcloud(py[:, 0:3], py[:, 3:6]) for py in pcdnpylist]
-# transform_pcd(pcdlist)
-# # pcdlist = [crop_pcd(pc) for pc in pcdlist]
-# origin = o3d.geometry.TriangleMesh.create_coordinate_frame()
-# origin.scale(0.5, center=origin.get_center())
-# o3d.visualization.draw_geometries(pcdlist + [origin])
-
-
-# def pcd_preprocessing(voxel_size=0.0):
-#     for i, pcdi in enumerate(pcdlist):
-#         pcdi.voxel_down_sample(voxel_size=voxel_size)
-#         pcdi.estimate_normals()
-#         pcdi.normalize_normals()
-#         pcdi.orient_normals_towards_camera_location()
-#         pcdi.remove_radius_outlier(nb_points=16, radius=0.05)
-#         # o3d.io.write_point_cloud(path + f"pcd_leftframe_id_{i}.ply", pcdi)
+# multiple pcd with transform
+pcdnpylist = [np.load(path + f"pcd_leftframe_id_{i}.npy") for i in range(8)]
+pcdlist = [numpy_to_o3dpointcloud(py[:, 0:3], py[:, 3:6]) for py in pcdnpylist]
+transform_pcd(pcdlist)
+pcdlist = [crop_pcd(pc) for pc in pcdlist]
+origin = o3d.geometry.TriangleMesh.create_coordinate_frame()
+origin.scale(0.5, center=origin.get_center())
+o3d.visualization.draw_geometries(pcdlist + [origin])
 
 
-# from multiway_reg import full_registration
+def pcd_preprocessing(voxel_size=0.0):
+    for i, pcdi in enumerate(pcdlist):
+        pcdi.voxel_down_sample(voxel_size=voxel_size)
+        pcdi.estimate_normals()
+        pcdi.normalize_normals()
+        pcdi.orient_normals_towards_camera_location()
+        pcdi.remove_radius_outlier(nb_points=16, radius=0.05)
+        # o3d.io.write_point_cloud(path + f"pcd_leftframe_id_{i}.ply", pcdi)
 
-# voxel_size = 0.02
-# pcd_preprocessing(voxel_size)
-# o3d.visualization.draw(pcdlist)
 
-# print("Full registration ...")
-# max_correspondence_distance_coarse = voxel_size * 15
-# max_correspondence_distance_fine = voxel_size * 1.5
-# with o3d.utility.VerbosityContextManager(o3d.utility.VerbosityLevel.Debug) as cm:
-#     pose_graph = full_registration(pcdlist, max_correspondence_distance_coarse, max_correspondence_distance_fine)
+from multiway_reg import full_registration
 
-# print("Optimizing PoseGraph ...")
-# option = o3d.pipelines.registration.GlobalOptimizationOption(max_correspondence_distance=max_correspondence_distance_fine, edge_prune_threshold=0.25, reference_node=0)
-# with o3d.utility.VerbosityContextManager(o3d.utility.VerbosityLevel.Debug) as cm:
-#     o3d.pipelines.registration.global_optimization(pose_graph, o3d.pipelines.registration.GlobalOptimizationLevenbergMarquardt(), o3d.pipelines.registration.GlobalOptimizationConvergenceCriteria(), option)
+voxel_size = 0.02
+timea = time.perf_counter_ns()
+pcd_preprocessing(voxel_size)
+timeb = time.perf_counter_ns()
+preproctime = (timeb - timea)*1e-6
+print(f"> preproctime: {preproctime}")
+o3d.visualization.draw(pcdlist)
 
-# print("Transform points and display")
-# for point_id in range(len(pcdlist)):
-#     print(pose_graph.nodes[point_id].pose)
+print("Full registration ...")
+max_correspondence_distance_coarse = voxel_size * 15
+max_correspondence_distance_fine = voxel_size * 1.5
+with o3d.utility.VerbosityContextManager(o3d.utility.VerbosityLevel.Debug) as cm:
+    pose_graph = full_registration(pcdlist, max_correspondence_distance_coarse, max_correspondence_distance_fine)
+
+print("Optimizing PoseGraph ...")
+option = o3d.pipelines.registration.GlobalOptimizationOption(max_correspondence_distance=max_correspondence_distance_fine, edge_prune_threshold=0.25, reference_node=0)
+with o3d.utility.VerbosityContextManager(o3d.utility.VerbosityLevel.Debug) as cm:
+    o3d.pipelines.registration.global_optimization(pose_graph, o3d.pipelines.registration.GlobalOptimizationLevenbergMarquardt(), o3d.pipelines.registration.GlobalOptimizationConvergenceCriteria(), option)
+
+print("Transform points and display")
+for point_id in range(len(pcdlist)):
+    print(pose_graph.nodes[point_id].pose)
+    pcdlist[point_id].transform(pose_graph.nodes[point_id].pose)
+o3d.visualization.draw(pcdlist)
+timec = time.perf_counter_ns()
+regtime = (timec - timeb)*1e-6
+print(f"> regtime: {regtime}")
+
+# combine pcd and save
+pcd_combined = o3d.geometry.PointCloud()
+for point_id in range(len(pcdlist)):
 #     pcdlist[point_id].transform(pose_graph.nodes[point_id].pose)
-# o3d.visualization.draw(pcdlist)
-
-# # combine pcd and save
-# pcd_combined = o3d.geometry.PointCloud()
-# for point_id in range(len(pcdlist)):
-#     pcdlist[point_id].transform(pose_graph.nodes[point_id].pose)
-#     pcd_combined += pcdlist[point_id]
+    pcd_combined += pcdlist[point_id]
 # pcd_combined_down = pcd_combined.voxel_down_sample(voxel_size=voxel_size)
 
-# pcd_combined = crop_pcd(pcd_combined)
-# o3d.visualization.draw([pcd_combined])
+pcd_combined = crop_pcd(pcd_combined)
+timed = time.perf_counter_ns()
+postproctime = (timed - timec)*1e-6
+print(f"> postproctime: {postproctime}")
 
-# # o3d.io.write_point_cloud("multiway_registration_full.ply", pcd_combined)
-# # o3d.io.write_point_cloud("multiway_registration_downsampled.ply", pcd_combined_down)
 
+o3d.io.write_point_cloud("multiway_registration_full.ply", pcd_combined)
+o3d.visualization.draw([pcd_combined])
+
+# o3d.io.write_point_cloud("multiway_registration_downsampled.ply", pcd_combined_down)
 # o3d.visualization.draw_geometries([pcd_combined_down])
