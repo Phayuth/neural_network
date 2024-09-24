@@ -1,8 +1,7 @@
 import os
 import sys
 
-wd = os.path.abspath(os.getcwd())
-sys.path.append(str(wd))
+sys.path.append(str(os.path.abspath(os.getcwd())))
 sys.path.append("/home/yuth/ws_yuthdev/robotics_manipulator")
 
 import numpy as np
@@ -156,6 +155,6 @@ def pcdrgb_load_zed():
 
 if __name__ == "__main__":
     # example()
-    process_pose_array()
+    # process_pose_array()
     # pcd_load_zed()
-    # pcdrgb_load_zed()
+    pcdrgb_load_zed()

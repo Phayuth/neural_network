@@ -29,7 +29,6 @@ build/
 MNIST/
 
 # pointcloud and stl
-*.yaml
 *.stl
 *.ply
 *.pcd
