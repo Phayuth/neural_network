@@ -8,7 +8,8 @@ import numpy as np
 from scipy.optimize import curve_fit
 
 from spatial_geometry.spatial_transformation import RigidBodyTransformation as rbt
-from util.general_util import read_txt_to_numpy
+from helper import read_txt_to_numpy
+
 
 # Original data
 parray = read_txt_to_numpy(txtFileString='datasave/joint_value/object_path.txt')

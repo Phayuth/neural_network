@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import sys
 import matplotlib.pyplot as plt
 import pytransform3d.camera as pc
 import pytransform3d.transformations as pt
