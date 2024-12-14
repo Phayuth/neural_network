@@ -13,7 +13,7 @@ dict_aruco = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
 parameters = cv2.aruco.DetectorParameters()
 detector = cv2.aruco.ArucoDetector(dict_aruco, parameters)
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(4)
 while True:
     ret, image_raw = cap.read()
     if ret:

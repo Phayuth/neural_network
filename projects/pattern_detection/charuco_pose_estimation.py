@@ -4,10 +4,8 @@ import numpy as np
 print(cv2.__version__)
 print(f"aruco dirc = {dir(cv2.aruco)}")
 
-cameraMatrix = np.array([[523.971998, 0.000000, 632.455814],
-                         [0.000000, 525.425192, 364.281755],
-                         [0.000000, 0.000000, 1.000000]])
-distCoeffs = np.array([0.019854, -0.036200, -0.001037, 0.001803, 0.000000])
+cameraMatrix = np.array([[598.460339, 0.000000, 317.880979], [0.000000, 597.424060, 233.262422], [0.000000, 0.000000, 1.000000]])
+distCoeffs = np.array([0.142729, -0.282139, -0.005699, -0.012027, 0.000000])
 
 boardgrid = (5, 7)
 squareLength = 0.0353  # m
@@ -18,7 +16,16 @@ board = cv2.aruco.CharucoBoard(boardgrid, squareLength, markerLength, dictionary
 params = cv2.aruco.DetectorParameters()
 detector = cv2.aruco.CharucoDetector(board)
 
-cap = cv2.VideoCapture(0)
+generate = True
+if generate == True:
+    image = board.generateImage(outSize=(400, 500), marginSize=10, borderBits=1)
+
+    import matplotlib.pyplot as plt
+
+    plt.imshow(image, cmap="gray")
+    plt.show()
+
+cap = cv2.VideoCapture(4)
 while True:
     ret, image_raw = cap.read()
     if ret:
@@ -41,8 +48,8 @@ while True:
         # markerIds	list of identifiers for each marker in corners. If markerCorners and markerCorners are empty, the function detect aruco markers and ids.
 
         if not charucoIds is None:
-            cv2.aruco.drawDetectedCornersCharuco(image_undst, charucoCorners, charucoIds) # chess corner
-            cv2.aruco.drawDetectedMarkers(image_undst, markerCorners, markerIds) # aruco corner
+            cv2.aruco.drawDetectedCornersCharuco(image_undst, charucoCorners, charucoIds)  # chess corner
+            cv2.aruco.drawDetectedMarkers(image_undst, markerCorners, markerIds)  # aruco corner
 
         # estimate all board z should point outward from paper
         valid, rvec, tvec = cv2.aruco.estimatePoseCharucoBoard(charucoCorners, charucoIds, board, cameraMatrix, distCoeffs, None, None, False)
